@@ -11,6 +11,7 @@
 |------|------|------|
 | 方案一 | 钉钉机器人集成 | [查看详情](#方案一钉钉机器人集成) |
 | 方案二 | 钉钉 DEAP Agent 集成 | [查看详情](#方案二钉钉-deap-agent-集成) |
+| 公网访问指南 | Accessing OpenClaw via Public Network | [English Guide](docs/PUBLIC_NETWORK_ACCESS.md) |
 
 # 方案一：钉钉机器人集成
 将钉钉机器人连接到 [OpenClaw](https://openclaw.ai) Gateway，支持 AI Card 流式响应和会话管理。
@@ -536,6 +537,31 @@ openclaw plugins install @dingtalk-real-ai/dingtalk-connector
 ### Q: 多 Agent 路由如何配置
 
 多 Agent 路由功能会自动处理，无需额外配置。连接器会根据配置自动管理多个 Agent 的会话隔离。如需自定义路由逻辑，请参考插件源码中的路由实现。
+
+### Q: How to access OpenClaw through public network? / 如何通过公网访问 OpenClaw？
+
+**Good news: you do NOT need a public IP.** Both integration schemes work behind NAT and corporate firewalls:
+
+| Scheme | Mechanism | Setup time |
+|--------|-----------|-----------|
+| **Scheme 1 – DingTalk Robot** | Outbound WebSocket (Stream) — your machine connects to DingTalk cloud | ~15 min |
+| **Scheme 2 – DingTalk DEAP Agent** | Reverse tunnel — Connector binary dials out to DEAP cloud | ~30 min |
+
+Only outbound internet access (HTTPS/WSS port 443) is required. No port forwarding, no public IP.
+
+If you want to expose the Gateway publicly (e.g., with nginx, Cloudflare Tunnel, or ngrok), set `gatewayBaseUrl` in your connector config to point at your custom public URL:
+
+```json5
+{
+  "channels": {
+    "dingtalk-connector": {
+      "gatewayBaseUrl": "https://your-gateway.example.com"
+    }
+  }
+}
+```
+
+For a full step-by-step guide, see **[docs/PUBLIC_NETWORK_ACCESS.md](docs/PUBLIC_NETWORK_ACCESS.md)**.
 
 ## 依赖
 
